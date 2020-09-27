@@ -1,0 +1,11 @@
+funtion1 {
+
+}
+
+function2 {
+
+}
+
+calling: function1, function1
+
+function1 function2 function1
