@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "master"
+  pull_request:
+    branches:
+      - "*"
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # go needs absolute directories, using the $HOME variable doesn't work here.
+  GOCACHE: /home/runner/work/go/pkg/build
+  GOPATH: /home/runner/work/go
+  GO_VERSION: 1.17.3
+
+jobs:
+  ########################
+  # check commits
+  ########################
+  check-commits:
+    name: check commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: fetch and rebase on ${{ github.base_ref }}
+        run: |
+          git remote add upstream https://github.com/ellemouton/gitPlayGround
+          git fetch upstream 
+          export GIT_COMMITTER_EMAIL="git-ci@example.com"
+          export GIT_COMMITTER_NAME="GIT CI"
+          git rebase upstream/${{ github.base_ref }}
+
+      - name: check commits
+        run: scripts/check-each-commit.sh upstream/${{ github.base_ref }}
