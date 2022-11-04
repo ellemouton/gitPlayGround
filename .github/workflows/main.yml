@@ -17,13 +17,13 @@ env:
   GOCACHE: /home/runner/work/go/pkg/build
   GOPATH: /home/runner/work/go
   GO_VERSION: 1.17.3
-  BASE_BRANCH: ${{ github.base_ref || github.ref_name }}
 
 jobs:
   ########################
   # check commits
   ########################
   check-commits:
+    if: github.event_name == 'pull_request'
     name: check commits
     runs-on: ubuntu-latest
     steps:
@@ -32,13 +32,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: fetch and rebase on ${{ env.BASE_BRANCH }}
+      - name: fetch and rebase on ${{ github.base_ref }}
         run: |
           git remote add upstream https://github.com/ellemouton/gitPlayGround
           git fetch upstream 
           export GIT_COMMITTER_EMAIL="git-ci@example.com"
           export GIT_COMMITTER_NAME="GIT CI"
-          git rebase upstream/${{ env.BASE_BRANCH }}
+          git rebase upstream/${{ github.base_ref }}
 
       - name: check commits
-        run: scripts/check-each-commit.sh upstream/${{ env.BASE_BRANCH }}
+        run: scripts/check-each-commit.sh upstream/${{ github.base_ref }}
